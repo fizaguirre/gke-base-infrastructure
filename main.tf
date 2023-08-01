@@ -6,7 +6,7 @@ resource "google_compute_network" "webvpc" {
 resource "google_compute_subnetwork" "gke-subnet" {
   name                     = "gke-subnet"
   network                  = google_compute_network.webvpc.id
-  ip_cidr_range            = "10.1.0.0/24"
+  ip_cidr_range            = "10.0.0.0/24"
   purpose                  = "PRIVATE"
   private_ip_google_access = true
 }
@@ -18,7 +18,7 @@ resource "google_service_account" "appclustersa" {
 
 resource "google_container_cluster" "appcluster" {
   name                     = "appcluster"
-  location                 = "us-central1-a"
+  location                 = var.gke_nodepool_location
   initial_node_count       = 1
   remove_default_node_pool = true
   network                  = google_compute_network.webvpc.name
@@ -31,13 +31,14 @@ resource "google_container_cluster" "appcluster" {
 }
 
 resource "google_container_node_pool" "appclusterpool" {
-  location           = var.gke_nodepool_zone
-  initial_node_count = 1
+  location           = var.gke_nodepool_location
+  initial_node_count = var.gke_nodes_replicas_count
   cluster            = google_container_cluster.appcluster.name
   node_config {
     machine_type    = "g1-small"
     preemptible     = true
     service_account = google_service_account.appclustersa.email
+    disk_size_gb    = 20
   }
 }
 
@@ -61,13 +62,14 @@ resource "tls_self_signed_cert" "app_cert" {
 }
 
 resource "local_file" "app_cert_pk_file" {
-  content  = tls_private_key.app_cert_pk.private_key_pem
-  filename = "./outputs/app.key"
+  content         = tls_private_key.app_cert_pk.private_key_pem
+  filename        = "${abspath(var.app_cert_folder_output)}/app.key"
+  file_permission = "0400"
 }
 
 resource "local_file" "app_cert_file" {
   content  = tls_self_signed_cert.app_cert.cert_pem
-  filename = "./outputs/app.cert"
+  filename = "${abspath(var.app_cert_folder_output)}/app.crt"
 }
 
 output "appclusterendpoint" {
@@ -76,9 +78,9 @@ output "appclusterendpoint" {
 }
 
 output "gke_info" {
-  value = "In order to interact with the GKE cluster make sure to get your credentials configured on the kubeconfig file. \n To get the GKE credentials run: gcloud container clusters get-credentials ${google_container_cluster.appcluster.name} --zone ${var.gke_nodepool_zone}"
+  value = "In order to interact with the GKE cluster make sure to get your credentials configured on the kubeconfig file. \n To get the GKE credentials run: gcloud container clusters get-credentials ${google_container_cluster.appcluster.name} --location ${var.gke_nodepool_location}"
 }
 
 output "certificates" {
-  value = "Self-signed certificates have been created to be used in server's TLS configuration.\nCheck the files at ./output"
+  value = "Self-signed certificates have been created to be used in server's TLS configuration.\nCheck the files at ${var.app_cert_folder_output}"
 }
