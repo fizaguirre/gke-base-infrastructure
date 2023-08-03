@@ -49,15 +49,15 @@ resource "tls_private_key" "app_cert_pk" {
 
 resource "tls_self_signed_cert" "app_cert" {
   allowed_uses          = ["server_auth"]
-  dns_names             = ["app.iza-learning-project.com"]
+  dns_names             = [var.cert_cn]
   private_key_pem       = tls_private_key.app_cert_pk.private_key_pem
   validity_period_hours = 720
   subject {
-    common_name         = "app.iza-learning-project.com"
-    country             = "CZ"
-    locality            = "Prague"
-    organization        = "Iza Learning Project"
-    organizational_unit = "DevOps"
+    common_name         = var.cert_cn
+    country             = var.cert_country
+    locality            = var.cert_locality
+    organization        = var.cert_organization
+    organizational_unit = var.cert_ou
   }
 }
 
