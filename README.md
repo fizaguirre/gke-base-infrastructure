@@ -6,6 +6,6 @@ This terraform configuration creates a base infrastructure for a GKE cluster in 
 * GKE cluster with configurable number of nodes
 * Server SSL certificates for TLS
 
-A set of variables should be provided for the configuration to run. For simplicity create a .tfvars file and use when running terraform.
+A set of variables should be provided for the configuration to run. For simplicity create a .tfvars file and use it when running terraform.
 
-At the end the Terraform configuration will output some inforamtion. The cluster information is included in this output with the command you can run to configure your kubectl config file to interact with the GKE cluster.
+At the end the Terraform configuration will output some information. The cluster information is included in this output with the command you can run to configure your kubectl config file to interact with the GKE cluster.
