@@ -4,3 +4,4 @@
 *.out
 *.tfvars
 outputs/
+.pre-commit-config.yaml
