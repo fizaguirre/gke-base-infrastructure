@@ -1,21 +1,28 @@
 variable "gcp_project" {
-  type = string
+  type        = string
+  description = "GCP Project ID"
 }
 
 variable "gcp_region" {
-  type = string
+  type        = string
+  description = "GCP Region ID"
 }
 
 variable "gke_nodepool_location" {
-  type = string
+  type        = string
+  description = "GKE node pool location can be either a Region or a Zone"
 }
 
 variable "app_cert_folder_output" {
-  type = string
+  type        = string
+  description = "Folder to output the Server SSL certificate"
 }
 
-variable "gke_nodes_replicas_count" {}
+variable "gke_nodes_replicas_count" {
+  description = "Number of nodes in the GKE node pool"
+}
 
+#The following variables sets SSL certificate attributes
 variable "cert_cn" {
   type = string
 }
