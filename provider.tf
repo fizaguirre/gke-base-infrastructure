@@ -3,4 +3,11 @@ provider "google" {
   region  = var.gcp_region
 }
 
-provider "tls" {}
+terraform {
+  required_providers {
+    tls = {
+      source = "hashicorp/tls"
+      version = "4.0.4"
+    }
+  }
+}
