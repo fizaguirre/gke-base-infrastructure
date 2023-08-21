@@ -13,6 +13,12 @@ variable "gke_nodepool_location" {
   description = "GKE node pool location can be either a Region or a Zone"
 }
 
+variable "gke_kubeconfig_path" {
+  type        = string
+  description = "Path to the KUBECONFIG file"
+  default     = "../shared-outputs/"
+}
+
 variable "app_cert_folder_output" {
   type        = string
   description = "Folder to output the Server SSL certificate"

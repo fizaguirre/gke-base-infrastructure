@@ -67,15 +67,36 @@ resource "local_file" "app_cert_file" {
   filename = "${abspath(var.app_cert_folder_output)}/app.crt"
 }
 
+resource "null_resource" "get_gke_credentials" {
+  depends_on = [google_container_cluster.appcluster]
+  provisioner "local-exec" {
+    environment = {
+      "KUBECONFIG" = var.gke_kubeconfig_path
+    }
+    command = "gcloud container clusters get-credentials ${google_container_cluster.appcluster.name} --location ${var.gke_nodepool_location}"
+  }
+}
+
 output "appclusterendpoint" {
   value       = google_container_cluster.appcluster.endpoint
   description = "GKE cluster address"
 }
 
 output "gke_info" {
-  value = "In order to interact with the GKE cluster make sure to get your credentials configured on the kubeconfig file. \n To get the GKE credentials run: gcloud container clusters get-credentials ${google_container_cluster.appcluster.name} --location ${var.gke_nodepool_location}"
+  value = "To interact with the GKE cluster set your the KUBECONFIG environment variable to ${var.gke_kubeconfig_path}, e.g. $ export KUBECONFIG=${var.gke_kubeconfig_path} \nOr to configure your default KUBECONFIG file run: $ gcloud container clusters get-credentials ${google_container_cluster.appcluster.name} --location ${var.gke_nodepool_location}"
 }
 
 output "certificates" {
   value = "Self-signed certificates have been created to be used in server's TLS configuration.\nCheck the files at ${var.app_cert_folder_output}"
+}
+
+output "_certificate" {
+  description = "SSL Certificate in PEM format."
+  value       = tls_self_signed_cert.app_cert.cert_pem
+}
+
+output "_certificate_key" {
+  description = "RSA Private Key that matches the SSL Certificate created in this module"
+  value       = tls_private_key.app_cert_pk.private_key_pem
+  sensitive   = true
 }

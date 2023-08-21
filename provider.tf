@@ -6,8 +6,12 @@ provider "google" {
 terraform {
   required_providers {
     tls = {
-      source = "hashicorp/tls"
+      source  = "hashicorp/tls"
       version = "4.0.4"
+    }
+    null = {
+      source  = "hashicorp/null"
+      version = "3.2.1"
     }
   }
 }
